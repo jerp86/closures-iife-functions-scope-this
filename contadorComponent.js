@@ -54,6 +54,7 @@
   
       return (valor = true) => {
         const atributo = 'disabled';
+        elementoBotao.removeEventListener('click', iniciarFn.bind(this));
   
         if (valor) {
           elementoBotao.setAttribute(atributo, valor);
