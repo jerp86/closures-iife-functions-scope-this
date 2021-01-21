@@ -13,6 +13,11 @@ class ContadorComponent {
       set: (currentContext, propertyKey, newValue) => {
         console.log({ currentContext, propertyKey, newValue });
 
+        // para parar todo o processamento
+        if (!currentContext.valor) {
+          currentContext.efetuarParada();
+        }
+
         currentContext[propertyKey] = newValue;
         return true;
       }
@@ -33,6 +38,30 @@ class ContadorComponent {
     elementoContador.innerHTML = textoPadrao.replace(identificadorTexto, contador.valor--);
   }
 
+  agendarParadaContador({ elementoContador, idIntervalo }) {
+    return () => {
+      clearInterval(idIntervalo);
+
+      elementoContador.innerHTML = '';
+      this.desabilitarBotao(false)
+    };
+  }
+
+  prepararBotao(elementoBotao, iniciarFn) {
+    elementoBotao.addEventListener('click', iniciarFn.bind(this));
+
+    return (valor = true) => {
+      const atributo = 'disabled';
+
+      if (valor) {
+        elementoBotao.setAttribute(atributo, valor);
+        return;
+      }
+
+      elementoBotao.removeAttribute(atributo);
+    };
+  }
+
   inicializar() {
     console.log('inicializou!!');
 
@@ -42,8 +71,18 @@ class ContadorComponent {
       elementoContador,
       contador,
     };
+    
     const fn = this.atualizarTexto(argumentos);
-
     const idIntervalo = setInterval(fn, PERIODO_INTERVALOR);
+
+    {
+      const elementoBotao = document.getElementById(BTN_REINICIAR);
+      const desabilitarBotao = this.prepararBotao(elementoBotao, this.inicializar)
+      desabilitarBotao();
+
+      const argumentos = { elementoContador, idIntervalo };
+      const pararContadorFn = this.agendarParadaContador.apply({ desabilitarBotao }, [argumentos]);
+      contador.efetuarParada = pararContadorFn;
+    }
   }
 }
