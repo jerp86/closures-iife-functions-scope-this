@@ -26,12 +26,24 @@ class ContadorComponent {
     return contador;
   }
 
+  atualizarTexto = ({ elementoContador, contador }) => () => {
+    const identificadorTexto = '$$contador';
+    const textoPadrao = `Começando em <strong>${identificadorTexto}</strong> segundos...`;
+
+    elementoContador.innerHTML = textoPadrao.replace(identificadorTexto, contador.valor--);
+  }
+
   inicializar() {
     console.log('inicializou!!');
 
-    const contador = this.prepararContadorProxy()
-    contador.valor = 100;
-    contador.valor = 90;
-    contador.valor = 80;
+    const elementoContador = document.getElementById(ID_CONTADOR);
+    const contador = this.prepararContadorProxy();
+    const argumentos = {
+      elementoContador,
+      contador,
+    };
+    const fn = this.atualizarTexto(argumentos);
+
+    const idIntervalo = setInterval(fn, PERIODO_INTERVALOR);
   }
 }
